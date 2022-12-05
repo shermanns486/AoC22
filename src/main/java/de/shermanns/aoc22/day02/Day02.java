@@ -3,6 +3,7 @@ package de.shermanns.aoc22.day02;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
 import de.shermanns.aoc22.Util;
@@ -39,8 +40,10 @@ public class Day02 extends Base {
             ergebnisRaetselZwei = ergebnisRaetselZwei + bewerteVersuchRaetselZwei(tokens);
         }
 
-        this.logger.info("Ergebnis Rätsel 1: " + ergebnisRaetselEins);
-        this.logger.info("Ergebnis Rätsel 2: " + ergebnisRaetselZwei);
+        if (this.logger.isLoggable(Level.INFO)) {
+            this.logger.info("Ergebnis Rätsel 1: " + ergebnisRaetselEins);
+            this.logger.info("Ergebnis Rätsel 2: " + ergebnisRaetselZwei);
+        }
     }
 
     private int bewerteVersuchRaetselEins(final String[] tokens) {
