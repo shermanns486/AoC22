@@ -39,28 +39,10 @@ public class Day04 extends Base {
                 ergebnisRaetselEins++;
             }
 
-            /*
-             * ...456...
-             * ....567..
-             * 
-             * ...456...
-             * ......78.
-             * 
-             * ....567..
-             * ...456...
-             * 
-             * ...45678.
-             * ....567..
-             * 
-             * ....567..
-             * ...45678.
-             * 
-             */
-
             // Bereiche, die einander überlappen
-            if ((sektion1Start <= sektion2Start && sektion1Ende <= sektion2Ende)
-                    || (sektion1Start <= sektion2Start && sektion1Start <= sektion2Ende)
-                    || (sektion2Start <= sektion1Start && sektion2Ende >= sektion1Ende)
+            if ((sektion1Start <= sektion2Start && sektion1Ende >= sektion2Start)
+                    || (sektion1Start <= sektion2Ende && sektion1Ende >= sektion2Ende)
+                    || (sektion1Start <= sektion2Start && sektion1Ende >= sektion2Ende)
                     || (sektion1Start >= sektion2Start && sektion1Ende <= sektion2Ende)) {
                 ergebnisRaetselZwei++;
             }
