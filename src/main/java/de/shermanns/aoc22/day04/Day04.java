@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.Util;
+import de.shermanns.aoc22.util.Util;
 
 public class Day04 extends Base {
     private static final String INPUT_TXT = "input.txt";

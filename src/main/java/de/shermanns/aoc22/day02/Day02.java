@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.Util;
+import de.shermanns.aoc22.util.Util;
 
 public class Day02 extends Base {
     private static final String INPUT_TXT = "input.txt";

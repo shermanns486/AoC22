@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.Util;
+import de.shermanns.aoc22.util.Util;
 
 public class Day01 extends Base {
     private static final String INPUT_TXT = "input.txt";

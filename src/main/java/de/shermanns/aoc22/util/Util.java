@@ -1,4 +1,4 @@
-package de.shermanns.aoc22;
+package de.shermanns.aoc22.util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
