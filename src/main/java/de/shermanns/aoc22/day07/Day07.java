@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
 import de.shermanns.aoc22.util.Node;
-import de.shermanns.aoc22.util.Util;
+import de.shermanns.aoc22.util.TreeUtils;
 
 public class Day07 extends Base {
     private static final String INPUT_TXT = "input.txt";
@@ -29,34 +29,32 @@ public class Day07 extends Base {
     public static void main(final String[] args) {
         final Day07 day07 = new Day07();
 
-        day07.logger.info("Lade Datei " + Day07.INPUT_TXT);
-        final List<String> zeilen = Util.loadResource(day07.getClass(), Day07.INPUT_TXT, day07.logger);
-
-        day07.loeseTeil1(zeilen);
+        day07.loeseTeil1();
         day07.loeseTeil2();
     }
 
     private void loeseTeil2() {
         this.usedSpace = Day07.MAX_DISK_SPACE
-                - this.root.getData()
-                        .getSize();
+                         - this.root.getData().getSize();
 
         final List<FileTreeEntry> dirList = new ArrayList<>();
         findDirToBeDeleted(this.root, dirList);
-        
+
         Collections.sort(dirList, Comparator.comparing(FileTreeEntry::getSize));
-        
+
         final long ergebnisTeil2 = dirList.get(0).getSize();
 
         this.logger.log(Level.INFO, "Ergebnis Teil 2: {0}", ergebnisTeil2);
     }
 
-    private void findDirToBeDeleted(final Node<FileTreeEntry> node, List<FileTreeEntry> foundChildren) {
+    private void findDirToBeDeleted(final Node<FileTreeEntry> node, final List<FileTreeEntry> foundChildren) {
         for (final Node<FileTreeEntry> child : node.getChildren()) {
             final FileTreeEntry fte = child.getData();
             final long size = fte.getSize();
 
-            if (fte.isDirectory() && this.usedSpace + size >= Day07.FREE_DISK_SPACE_NEEDED) {
+            if (fte.isDirectory()
+                && this.usedSpace
+                   + size >= Day07.FREE_DISK_SPACE_NEEDED) {
                 System.out.println(size);
                 foundChildren.add(fte);
             }
@@ -65,12 +63,12 @@ public class Day07 extends Base {
         }
     }
 
-    private void loeseTeil1(final List<String> zeilen) {
-        createTree(zeilen);
+    private void loeseTeil1() {
+        createTree(this.zeilen);
 
         calculateDirSize(this.root);
 
-        // TreeUtils.printTree(this.root, " ");
+        TreeUtils.printTree(this.root, " ");
 
         final long ergebnisTeil1 = calculateSumDirWithSizeAlmost100k();
 
@@ -83,38 +81,31 @@ public class Day07 extends Base {
 
         Collections.sort(dirList, Comparator.comparing(FileTreeEntry::getSize));
 
-        return dirList.stream()
-                .map(FileTreeEntry::getSize)
-                .reduce(0L, Long::sum);
+        return dirList.stream().map(FileTreeEntry::getSize).reduce(0L, Long::sum);
     }
 
     private void findDirsWithSizeAlmost100k(final Node<FileTreeEntry> node, final List<FileTreeEntry> foundChildren) {
-        node.getChildren()
-                .forEach(each -> {
-                    final FileTreeEntry fte = each.getData();
+        node.getChildren().forEach(each -> {
+            final FileTreeEntry fte = each.getData();
 
-                    if (fte.isDirectory() && fte.getSize() <= Day07.MAX_FILE_SIZE) {
-                        foundChildren.add(fte);
-                    }
-                    findDirsWithSizeAlmost100k(each, foundChildren);
-                });
+            if (fte.isDirectory()
+                && fte.getSize() <= Day07.MAX_FILE_SIZE) {
+                foundChildren.add(fte);
+            }
+            findDirsWithSizeAlmost100k(each, foundChildren);
+        });
     }
 
     private void calculateDirSize(final Node<FileTreeEntry> node) {
-        node.getChildren()
-                .stream()
-                .forEach(this::calculateDirSize);
+        node.getChildren().stream().forEach(this::calculateDirSize);
 
         long dirSize = 0L;
         for (final Node<FileTreeEntry> child : node.getChildren()) {
-            dirSize += child.getData()
-                    .getSize();
+            dirSize += child.getData().getSize();
         }
 
-        if (node.getData()
-                .isDirectory()) {
-            node.getData()
-                    .setSize(dirSize);
+        if (node.getData().isDirectory()) {
+            node.getData().setSize(dirSize);
         }
     }
 
@@ -165,9 +156,8 @@ public class Day07 extends Base {
         for (final Node<FileTreeEntry> child : this.workingNode.getChildren()) {
             final FileTreeEntry childData = child.getData();
 
-            if (childData.getName()
-                    .equals(dirName)
-                    && childData.isDirectory()) {
+            if (childData.getName().equals(dirName)
+                && childData.isDirectory()) {
                 return child;
             }
         }
@@ -184,6 +174,11 @@ public class Day07 extends Base {
         else {
             this.workingNode.addChild(new FileTreeEntry(zerlegteZeile[1], Long.valueOf(zerlegteZeile[0]), false));
         }
+    }
+
+    @Override
+    protected String getInputFile() {
+        return Day07.INPUT_TXT;
     }
 }
 
@@ -208,7 +203,8 @@ class FileTreeEntry {
         if (this == obj) {
             return true;
         }
-        if ((obj == null) || (getClass() != obj.getClass())) {
+        if (obj == null
+            || getClass() != obj.getClass()) {
             return false;
         }
         final FileTreeEntry other = (FileTreeEntry) obj;
@@ -217,7 +213,10 @@ class FileTreeEntry {
 
     @Override
     public String toString() {
-        return this.name + " " + (isDirectory() ? "(dir) " : "") + this.size;
+        return this.name
+               + " "
+               + (isDirectory() ? "(dir) " : "")
+               + this.size;
     }
 
     public String getName() {

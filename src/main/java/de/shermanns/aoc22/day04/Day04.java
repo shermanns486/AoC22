@@ -1,28 +1,21 @@
 package de.shermanns.aoc22.day04;
 
-import java.util.List;
 import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.util.Util;
 
 public class Day04 extends Base {
     private static final String INPUT_TXT = "input.txt";
 
     public static void main(final String[] args) {
-        final Day04 day04 = new Day04();
-
-        day04.logger.info("Lade Datei " + Day04.INPUT_TXT);
-        final List<String> zeilen = Util.loadResource(day04.getClass(), Day04.INPUT_TXT, day04.logger);
-
-        day04.loeseRaetsel(zeilen);
+        new Day04().loeseRaetsel();
     }
 
-    private void loeseRaetsel(final List<String> zeilen) {
+    private void loeseRaetsel() {
         int ergebnisRaetselEins = 0;
         int ergebnisRaetselZwei = 0;
 
-        for (final String zeile : zeilen) {
+        for (final String zeile : this.zeilen) {
             final String[] paar = zeile.split(",");
 
             final String[] elf1 = paar[0].split("-");
@@ -34,23 +27,36 @@ public class Day04 extends Base {
             final int sektion2Ende = Integer.parseInt(elf2[1]);
 
             // Bereiche, die vollständig enthalten sind
-            if ((sektion1Start <= sektion2Start && sektion1Ende >= sektion2Ende)
-                    || (sektion2Start <= sektion1Start && sektion2Ende >= sektion1Ende)) {
+            if (sektion1Start <= sektion2Start
+                && sektion1Ende >= sektion2Ende
+                || sektion2Start <= sektion1Start
+                   && sektion2Ende >= sektion1Ende) {
                 ergebnisRaetselEins++;
             }
 
             // Bereiche, die einander überlappen
-            if ((sektion1Start <= sektion2Start && sektion1Ende >= sektion2Start)
-                    || (sektion1Start <= sektion2Ende && sektion1Ende >= sektion2Ende)
-                    || (sektion1Start <= sektion2Start && sektion1Ende >= sektion2Ende)
-                    || (sektion1Start >= sektion2Start && sektion1Ende <= sektion2Ende)) {
+            if (sektion1Start <= sektion2Start
+                && sektion1Ende >= sektion2Start
+                || sektion1Start <= sektion2Ende
+                   && sektion1Ende >= sektion2Ende
+                || sektion1Start <= sektion2Start
+                   && sektion1Ende >= sektion2Ende
+                || sektion1Start >= sektion2Start
+                   && sektion1Ende <= sektion2Ende) {
                 ergebnisRaetselZwei++;
             }
         }
 
         if (this.logger.isLoggable(Level.INFO)) {
-            this.logger.info("Ergebnis Rätsel 1: " + ergebnisRaetselEins);
-            this.logger.info("Ergebnis Rätsel 2: " + ergebnisRaetselZwei);
+            this.logger.info("Ergebnis Rätsel 1: "
+                             + ergebnisRaetselEins);
+            this.logger.info("Ergebnis Rätsel 2: "
+                             + ergebnisRaetselZwei);
         }
+    }
+
+    @Override
+    protected String getInputFile() {
+        return Day04.INPUT_TXT;
     }
 }

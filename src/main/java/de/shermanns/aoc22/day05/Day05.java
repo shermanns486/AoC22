@@ -10,47 +10,47 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.util.Util;
 
 public class Day05 extends Base {
     private static final String INPUT_TXT = "input.txt";
 
     public static void main(final String[] args) {
-        final Day05 day05 = new Day05();
-
-        day05.logger.info("Lade Datei " + Day05.INPUT_TXT);
-        final List<String> zeilen = Util.loadResource(day05.getClass(), Day05.INPUT_TXT, day05.logger);
-
-        day05.loeseRaetsel(zeilen);
+        new Day05().loeseRaetsel();
     }
 
-    private void loeseRaetsel(final List<String> zeilen) {
-        final List<int[]> operations = parseOperations(zeilen.subList(10, zeilen.size()));
+    private void loeseRaetsel() {
+        final List<int[]> operations = parseOperations(this.zeilen.subList(10, this.zeilen.size()));
 
-        List<Stack<Character>> stacks = fillStacks(zeilen.subList(0, 8));
+        List<Stack<Character>> stacks = fillStacks(this.zeilen.subList(0, 8));
         doWork(operations, stacks);
         final String loesung1 = getLoesung(stacks);
 
-        stacks = fillStacks(zeilen.subList(0, 8));
+        stacks = fillStacks(this.zeilen.subList(0, 8));
         doWork9001(operations, stacks);
         final String loesung2 = getLoesung(stacks);
 
         if (this.logger.isLoggable(Level.INFO)) {
-            this.logger.info("Ergebnis Rätsel 1: " + loesung1);
-            this.logger.info("Ergebnis Rätsel 2: " + loesung2);
+            this.logger.info("Ergebnis Rätsel 1: "
+                             + loesung1);
+            this.logger.info("Ergebnis Rätsel 2: "
+                             + loesung2);
         }
     }
 
     private void doWork9001(final List<int[]> operations, final List<Stack<Character>> stacks) {
         for (final int[] parameter : operations) {
             final int menge = parameter[0];
-            final int vonStack = parameter[1] - 1;
-            final int zuStack = parameter[2] - 1;
+            final int vonStack = parameter[1]
+                                 - 1;
+            final int zuStack = parameter[2]
+                                - 1;
 
             final Stack<Character> stackVon = stacks.get(vonStack);
             final Stack<Character> stackZu = stacks.get(zuStack);
 
-            stackZu.addAll(stackVon.subList(stackVon.size() - menge, stackVon.size()));
+            stackZu.addAll(stackVon.subList(stackVon.size()
+                                            - menge,
+                    stackVon.size()));
 
             for (int i = 0; i < menge; i++) {
                 stackVon.pop();
@@ -73,13 +73,13 @@ public class Day05 extends Base {
     private void doWork(final List<int[]> operations, final List<Stack<Character>> stacks) {
         for (final int[] parameter : operations) {
             final int menge = parameter[0];
-            final int vonStack = parameter[1] - 1;
-            final int zuStack = parameter[2] - 1;
+            final int vonStack = parameter[1]
+                                 - 1;
+            final int zuStack = parameter[2]
+                                - 1;
 
             for (int i = 0; i < menge; i++) {
-                stacks.get(zuStack)
-                        .push(stacks.get(vonStack)
-                                .pop());
+                stacks.get(zuStack).push(stacks.get(vonStack).pop());
             }
         }
     }
@@ -133,5 +133,10 @@ public class Day05 extends Base {
             stacks.add(new Stack<>());
         }
         return stacks;
+    }
+
+    @Override
+    protected String getInputFile() {
+        return Day05.INPUT_TXT;
     }
 }

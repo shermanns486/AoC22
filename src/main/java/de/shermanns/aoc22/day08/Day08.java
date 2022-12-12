@@ -5,7 +5,6 @@ import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
 import de.shermanns.aoc22.util.Matrix;
-import de.shermanns.aoc22.util.Util;
 
 public class Day08 extends Base {
     private static final String INPUT_TXT = "input.txt";
@@ -15,11 +14,7 @@ public class Day08 extends Base {
     public static void main(final String[] args) {
         final Day08 day08 = new Day08();
 
-        day08.logger.info("Lade Datei "
-                          + Day08.INPUT_TXT);
-        final List<String> zeilen = Util.loadResource(day08.getClass(), Day08.INPUT_TXT, day08.logger);
-
-        day08.createPlantage(zeilen);
+        day08.createPlantage();
 
         final int ergebnisTeil1 = day08.ermittleSichtbarkeit();
 
@@ -36,7 +31,7 @@ public class Day08 extends Base {
         final int spaltenAnzahl = this.plantage.getSpaltenAnzahl();
 
         int highScore = 0;
-        
+
         for (int zeilenIndex = 0; zeilenIndex < zeilenAnzahl; zeilenIndex++) {
             for (int spaltenIndex = 0; spaltenIndex < spaltenAnzahl; spaltenIndex++) {
                 final int oben = blickNachOben(zeilenIndex, spaltenIndex);
@@ -48,7 +43,7 @@ public class Day08 extends Base {
                                   * unten
                                   * rechts
                                   * links;
-                
+
                 if (score > highScore) {
                     highScore = score;
                 }
@@ -236,15 +231,15 @@ public class Day08 extends Base {
         return sichtbareBaeume;
     }
 
-    private void createPlantage(final List<String> zeilen) {
+    private void createPlantage() {
         // Plantage initialisieren
-        final int zeilenAnzahl = zeilen.size();
-        final int spaltenAnzahl = zeilen.get(0).length();
+        final int zeilenAnzahl = this.zeilen.size();
+        final int spaltenAnzahl = this.zeilen.get(0).length();
 
         this.plantage = new Matrix<>(zeilenAnzahl, spaltenAnzahl, Baum.class);
 
         for (int zeilenIndex = 0; zeilenIndex < zeilenAnzahl; zeilenIndex++) {
-            final String zeile = zeilen.get(zeilenIndex);
+            final String zeile = this.zeilen.get(zeilenIndex);
 
             for (int spaltenIndex = 0; spaltenIndex < spaltenAnzahl; spaltenIndex++) {
                 final int hoehe = Integer.parseInt(zeile.substring(spaltenIndex, spaltenIndex
@@ -259,5 +254,10 @@ public class Day08 extends Base {
                 this.plantage.set(zeilenIndex, spaltenIndex, new Baum(hoehe, sichtbar));
             }
         }
+    }
+
+    @Override
+    protected String getInputFile() {
+        return Day08.INPUT_TXT;
     }
 }

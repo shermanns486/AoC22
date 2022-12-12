@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import de.shermanns.aoc22.Base;
-import de.shermanns.aoc22.util.Util;
 
 public class Day02 extends Base {
     private static final String INPUT_TXT = "input.txt";
@@ -26,64 +25,61 @@ public class Day02 extends Base {
     private static final List<String> gewonnenList = List.of("AY", "BZ", "CX");
 
     private void raetselLoesen() {
-        this.logger.info("Lese Datei " + Day02.INPUT_TXT + " ein");
-
-        final List<String> zeilenList = Util.loadResource(getClass(), Day02.INPUT_TXT, this.logger);
-
         int ergebnisRaetselEins = 0;
         int ergebnisRaetselZwei = 0;
 
-        for (final String zeile : zeilenList) {
+        for (final String zeile : this.zeilen) {
             final String[] tokens = zeile.split(" ");
 
-            ergebnisRaetselEins = ergebnisRaetselEins + bewerteVersuchRaetselEins(tokens);
-            ergebnisRaetselZwei = ergebnisRaetselZwei + bewerteVersuchRaetselZwei(tokens);
+            ergebnisRaetselEins = ergebnisRaetselEins
+                                  + bewerteVersuchRaetselEins(tokens);
+            ergebnisRaetselZwei = ergebnisRaetselZwei
+                                  + bewerteVersuchRaetselZwei(tokens);
         }
 
         if (this.logger.isLoggable(Level.INFO)) {
-            this.logger.info("Ergebnis Rätsel 1: " + ergebnisRaetselEins);
-            this.logger.info("Ergebnis Rätsel 2: " + ergebnisRaetselZwei);
+            this.logger.info("Ergebnis Rätsel 1: "
+                             + ergebnisRaetselEins);
+            this.logger.info("Ergebnis Rätsel 2: "
+                             + ergebnisRaetselZwei);
         }
     }
 
     private int bewerteVersuchRaetselEins(final String[] tokens) {
         int ergebnis = 0;
 
-        if (Day02.verlorenList.contains(tokens[0] + tokens[1])) {
-            ergebnis = ergebnis + 0;
+        if (Day02.verlorenList.contains(tokens[0]
+                                        + tokens[1])) {
+            ergebnis = ergebnis
+                       + 0;
         }
-        else if (Day02.unentschiedenList.contains(tokens[0] + tokens[1])) {
-            ergebnis = ergebnis + 3;
+        else if (Day02.unentschiedenList.contains(tokens[0]
+                                                  + tokens[1])) {
+            ergebnis = ergebnis
+                       + 3;
         }
         else {
-            ergebnis = ergebnis + 6;
+            ergebnis = ergebnis
+                       + 6;
         }
 
-        return ergebnis + Day02.punkteMap.get(tokens[1]);
+        return ergebnis
+               + Day02.punkteMap.get(tokens[1]);
     }
 
     private int bewerteVersuchRaetselZwei(final String[] tokens) {
         final String string;
         if (tokens[1].equals("X")) {
             // Verlieren
-            string = Day02.verlorenList.stream()
-                    .filter(s -> s.startsWith(tokens[0]))
-                    .findFirst()
-                    .orElse("");
+            string = Day02.verlorenList.stream().filter(s -> s.startsWith(tokens[0])).findFirst().orElse("");
         }
         else if (tokens[1].equals("Y")) {
             // Unentschieden
-            string = Day02.unentschiedenList.stream()
-                    .filter(s -> s.startsWith(tokens[0]))
-                    .findFirst()
-                    .orElse("");
+            string = Day02.unentschiedenList.stream().filter(s -> s.startsWith(tokens[0])).findFirst().orElse("");
         }
         else {
             // Gewonnen
-            string = Day02.gewonnenList.stream()
-                    .filter(s -> s.startsWith(tokens[0]))
-                    .findFirst()
-                    .orElse("");
+            string = Day02.gewonnenList.stream().filter(s -> s.startsWith(tokens[0])).findFirst().orElse("");
         }
 
         final String[] tokensNeu = { String.valueOf(string.charAt(0)), String.valueOf(string.charAt(1)) };
@@ -93,5 +89,10 @@ public class Day02 extends Base {
 
     public static void main(final String[] args) {
         new Day02().raetselLoesen();
+    }
+
+    @Override
+    protected String getInputFile() {
+        return Day02.INPUT_TXT;
     }
 }
