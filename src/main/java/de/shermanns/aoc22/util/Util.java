@@ -17,7 +17,8 @@ public class Util {
             final String content = IOUtils.toString(clazz.getResourceAsStream(pfadString), StandardCharsets.UTF_8);
             final String[] lines = content.split("\\r?\\n");
 
-            logger.info(() -> lines.length + " Zeilen eingelesen");
+            logger.info(() -> lines.length
+                              + " Zeilen eingelesen");
 
             return List.of(lines);
         }
@@ -26,5 +27,11 @@ public class Util {
         }
 
         return new ArrayList<>();
+    }
+
+    public static void setCharAt(String s, final int index, final Character ch) {
+        final StringBuilder builder = new StringBuilder(s);
+        builder.setCharAt(index, ch);
+        s = builder.toString();
     }
 }
