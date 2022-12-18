@@ -73,20 +73,23 @@ public class Spielfeld {
 
     private final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    private static final int NUMBER_OF_KNOTS = 2;
+
     private static final Character VOID_CHAR = '.';
     private static final Character START_CHAR = 's';
     private static final Character HEAD_CHAR = 'H';
     private static final Character TAIL_CHAR = 'T';
     private static final Character VISITED_CHAR = '#';
 
+    private final List<Point> knots = new ArrayList<>();
     private final List<Point> visitedByTail = new ArrayList<>();
-
-    private final Point start = new Point(0, 0);
-    private final Point head = new Point(0, 0);
-    private final Point tail = new Point(0, 0);
 
     public Spielfeld() {
         this.visitedByTail.add(new Point(0, 0));
+
+        for (int i = 0; i <= Spielfeld.NUMBER_OF_KNOTS; i++) {
+            this.knots.add(new Point(0, 0));
+        }
     }
 
     public int getWidth() {
@@ -99,7 +102,7 @@ public class Spielfeld {
                 .map(Point::getX) //
                 .max(Integer::compareTo) //
                 .orElse(0);
-        final Integer headX = this.head.getX();
+        final Integer headX = this.knots.get(0).getX();
         return headX > max ? headX : max;
     }
 
@@ -108,7 +111,7 @@ public class Spielfeld {
                 .map(Point::getX) //
                 .min(Integer::compareTo) //
                 .orElse(0);
-        final Integer headX = this.head.getX();
+        final Integer headX = this.knots.get(0).getX();
         return headX < min ? headX : min;
     }
 
@@ -122,7 +125,7 @@ public class Spielfeld {
                 .map(Point::getY) //
                 .max(Integer::compareTo) //
                 .orElse(0);
-        final Integer headY = this.head.getY();
+        final Integer headY = this.knots.get(0).getY();
         return headY > max ? headY : max;
     }
 
@@ -131,39 +134,46 @@ public class Spielfeld {
                 .map(Point::getY) //
                 .min(Integer::compareTo) //
                 .orElse(0);
-        final Integer headY = this.head.getY();
+        final Integer headY = this.knots.get(0).getY();
         return headY < min ? headY : min;
+    }
+
+    private Point getHead() {
+        return this.knots.get(0);
+    }
+
+    private Point getTail() {
+        return this.knots.get(Spielfeld.NUMBER_OF_KNOTS
+                              - 1);
     }
 
     public void go(final String direction, final int count) {
         for (int i = 0; i < count; i++) {
             switch (direction) {
             case Spielfeld.LEFT:
-                this.head.incX(-1);
+                getHead().incX(-1);
                 break;
 
             case Spielfeld.RIGHT:
-                this.head.incX(1);
+                getHead().incX(1);
                 break;
 
             case Spielfeld.UP:
-                this.head.incY(-1);
+                getHead().incY(-1);
                 break;
 
             case Spielfeld.DOWN:
-                this.head.incY(1);
+                getHead().incY(1);
                 break;
 
             default:
             }
 
-            if (!this.visitedByTail.contains(this.tail)) {
-                this.visitedByTail.add(new Point(this.tail));
+            if (!this.visitedByTail.contains(getTail())) {
+                this.visitedByTail.add(new Point(getTail()));
             }
 
             calculateNewTail();
-
-            // print();
         }
 
         // this.logger.log(Level.INFO, "{0}", direction
@@ -173,72 +183,77 @@ public class Spielfeld {
     }
 
     private void calculateNewTail() {
-        final int diffX = this.head.getX()
-                          - this.tail.getX();
-        final int diffY = this.head.getY()
-                          - this.tail.getY();
+        for (int i = 0; i < Spielfeld.NUMBER_OF_KNOTS
+                            - 1; i++) {
+            final Point begin = this.knots.get(i);
+            final Point end = this.knots.get(i
+                                             + 1);
 
-        if (diffY == 0) {
-            if (diffX == -2) {
-                // Left
-                this.tail.incX(-1);
-            }
+            final int diffX = begin.getX()
+                              - end.getX();
+            final int diffY = begin.getY()
+                              - end.getY();
 
-            if (diffX == 2) {
-                // Right
-                this.tail.incX(1);
-            }
-        }
-        else if (diffX == 0) {
-            if (diffY == -2) {
-                // Up
-                this.tail.incY(-1);
-            }
+            if (diffY == 0) {
+                if (diffX == -2) {
+                    // Left
+                    end.incX(-1);
+                }
 
-            if (diffY == 2) {
-                // Down
-                this.tail.incY(1);
+                if (diffX == 2) {
+                    // Right
+                    end.incX(1);
+                }
             }
-        }
-        else if (!touching(this.head, this.tail)) {
-            if (Math.abs(diffX) > 1) {
-                this.tail.incX(diffX
-                               / 2);
-            }
-            else {
-                this.tail.incX(diffX);
-            }
+            else if (diffX == 0) {
+                if (diffY == -2) {
+                    // Up
+                    end.incY(-1);
+                }
 
-            if (Math.abs(diffY) > 1) {
-                this.tail.incY(diffY
-                               / 2);
+                if (diffY == 2) {
+                    // Down
+                    end.incY(1);
+                }
             }
-            else {
-                this.tail.incY(diffY);
+            else if (!touching(begin, end)) {
+                if (Math.abs(diffX) > 1) {
+                    end.incX(diffX
+                             / 2);
+                }
+                else {
+                    end.incX(diffX);
+                }
+
+                if (Math.abs(diffY) > 1) {
+                    end.incY(diffY
+                             / 2);
+                }
+                else {
+                    end.incY(diffY);
+                }
             }
         }
     }
 
-    protected boolean touching(final Point head, final Point tail) {
-        final int tailHeadDiffX = tail.getX()
-                                  - head.getX();
-        final int tailHeadDiffY = tail.getY()
-                                  - head.getY();
+    protected boolean touching(final Point begin, final Point end) {
+        final int diffX = end.getX()
+                          - begin.getX();
+        final int diffY = end.getY()
+                          - begin.getY();
 
-        return tailHeadDiffX == 0
-               && tailHeadDiffY == 0
-               || Math.abs(tailHeadDiffX) == 1
-                  && Math.abs(tailHeadDiffY) < 2;
+        return diffX == 0
+               && diffY == 0
+               || Math.abs(diffX) == 1
+                  && Math.abs(diffY) < 2;
     }
 
     @Override
     public String toString() {
         return "Spielfeld [visitedByTail="
                + this.visitedByTail
-               + ", head="
-               + this.head
-               + ", tail="
-               + this.tail
+               + ", knots="
+               + this.knots
                + "]";
     }
 
@@ -250,13 +265,20 @@ public class Spielfeld {
             for (int spalte = getMinX(); spalte <= getMaxX(); spalte++) {
                 final Point p = new Point(spalte, zeile);
 
-                if (this.start.equals(p)) {
+                // Zuerst den ganzen Schwanz
+                for (int knot = 0; knot < Spielfeld.NUMBER_OF_KNOTS; knot++) {
+                    if (this.knots.get(knot).equals(p)) {
+                        builder.append(knot);
+                    }
+                }
+
+                if (new Point(0, 0).equals(p)) {
                     builder.append(Spielfeld.START_CHAR);
                 }
-                else if (this.head.equals(p)) {
+                else if (getHead().equals(p)) {
                     builder.append(Spielfeld.HEAD_CHAR);
                 }
-                else if (this.tail.equals(p)) {
+                else if (getTail().equals(p)) {
                     builder.append(Spielfeld.TAIL_CHAR);
                 }
                 else if (this.visitedByTail.contains(p)) {
@@ -271,7 +293,6 @@ public class Spielfeld {
 
         this.logger.log(Level.INFO, builder::toString);
         this.logger.log(Level.INFO, "{0}", "Ergebnis Rätsel 1: "
-                                           + (this.visitedByTail.size()
-                                              + 1));
+                                           + this.visitedByTail.size());
     }
 }
