@@ -6,65 +6,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class Point {
-    private Integer x;
-    private Integer y;
-
-    Point(final Integer x, final Integer y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    Point(final Point point) {
-        this.x = point.getX();
-        this.y = point.getY();
-    }
-
-    public Integer getX() {
-        return this.x;
-    }
-
-    public Integer getY() {
-        return this.y;
-    }
-
-    public void incX(final Integer count) {
-        this.x += count;
-    }
-
-    public void incY(final Integer count) {
-        this.y += count;
-    }
-
-    @Override
-    public String toString() {
-        return "( "
-               + this.x
-               + ", "
-               + this.y
-               + " )";
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.x, this.y);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null
-            || getClass() != obj.getClass()) {
-            return false;
-        }
-        final Point other = (Point) obj;
-        return Objects.equals(this.x, other.x)
-               && Objects.equals(this.y, other.y);
-    }
-}
-
 public class Spielfeld {
     public static final String UP = "U";
     public static final String DOWN = "D";
@@ -148,6 +89,9 @@ public class Spielfeld {
     }
 
     public void go(final String direction, final int count) {
+        this.logger.log(Level.INFO, "{0}", direction
+                                           + count);
+
         for (int i = 0; i < count; i++) {
             switch (direction) {
             case Spielfeld.LEFT:
@@ -176,10 +120,7 @@ public class Spielfeld {
             calculateNewTail();
         }
 
-        // this.logger.log(Level.INFO, "{0}", direction
-        // + count
-        // + ": "
-        // + toString());
+        this.logger.log(Level.INFO, "{0}", toString());
     }
 
     private void calculateNewTail() {
@@ -294,5 +235,64 @@ public class Spielfeld {
         this.logger.log(Level.INFO, builder::toString);
         this.logger.log(Level.INFO, "{0}", "Ergebnis Rätsel 1: "
                                            + this.visitedByTail.size());
+    }
+}
+
+class Point {
+    private Integer x;
+    private Integer y;
+
+    Point(final Integer x, final Integer y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    Point(final Point point) {
+        this.x = point.getX();
+        this.y = point.getY();
+    }
+
+    public Integer getX() {
+        return this.x;
+    }
+
+    public Integer getY() {
+        return this.y;
+    }
+
+    public void incX(final Integer count) {
+        this.x += count;
+    }
+
+    public void incY(final Integer count) {
+        this.y += count;
+    }
+
+    @Override
+    public String toString() {
+        return "( "
+               + this.x
+               + ", "
+               + this.y
+               + " )";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.x, this.y);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null
+            || getClass() != obj.getClass()) {
+            return false;
+        }
+        final Point other = (Point) obj;
+        return Objects.equals(this.x, other.x)
+               && Objects.equals(this.y, other.y);
     }
 }
