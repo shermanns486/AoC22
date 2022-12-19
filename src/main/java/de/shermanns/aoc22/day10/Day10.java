@@ -11,10 +11,12 @@ public class Day10 extends Base {
     Integer registerX = 1;
 
     Integer cycle = 0;
-    
+
     Integer loesungTeil1 = 0;
 
     List<Integer> markerList = List.of(20, 60, 100, 140, 180, 220);
+
+    StringBuilder crt = new StringBuilder();
 
     public static void main(final String[] args) {
         new Day10().loeseRaetselTeil1();
@@ -31,21 +33,23 @@ public class Day10 extends Base {
             }
         }
 
-        this.logger.log(Level.INFO, "Lösung Teil 1: {0}", loesungTeil1);
+        this.logger.log(Level.INFO, "Lösung Teil 1: {0}", this.loesungTeil1);
 
-        return loesungTeil1;
+        this.logger.log(Level.INFO, "Lösung Teil 2: {0}", printCrt(40));
+
+        return this.loesungTeil1;
     }
 
     private void noop() {
-        logger.log(Level.INFO, "noop");
-        
+        this.logger.log(Level.INFO, "noop");
+
         this.cycle++;
         interrupt();
     }
 
     private void addX(final int value) {
-        logger.log(Level.INFO, "addx {0}", value);
-        
+        this.logger.log(Level.INFO, "addx {0}", value);
+
         this.cycle++;
         interrupt();
 
@@ -55,15 +59,39 @@ public class Day10 extends Base {
     }
 
     private void interrupt() {
-        this.logger.log(Level.INFO, "X: {0} Cycle: {1}", new Integer[] { this.registerX, this.cycle });
-        
-        if (markerList.contains(cycle)) {
-            Integer ergebnis = cycle * registerX;
-            
-            this.logger.log(Level.INFO, "MARKER {0}: {0} * {1} = {2}", new Integer[] { this.cycle, this.registerX, ergebnis });
-            
-            loesungTeil1 += ergebnis;
+        final int linePos = this.crt.length()
+                            % 40;
+        if (this.registerX
+            - 1 <= linePos
+            && this.registerX
+               + 1 >= linePos) {
+            this.crt.append('#');
         }
+        else {
+            this.crt.append('.');
+        }
+
+        this.logger.log(Level.INFO, "X: {0} Cycle: {1}", new Integer[] { this.registerX, this.cycle });
+
+        if (this.markerList.contains(this.cycle)) {
+            final Integer ergebnis = this.cycle
+                                     * this.registerX;
+
+            this.logger.log(Level.INFO, "MARKER {0}: {0} * {1} = {2}",
+                    new Integer[] { this.cycle, this.registerX, ergebnis });
+
+            this.loesungTeil1 += ergebnis;
+        }
+    }
+
+    private String printCrt(final int width) {
+        final StringBuilder builder = new StringBuilder(System.lineSeparator());
+        for (int i = 0; i < 240; i += width) {
+            builder.append(this.crt.subSequence(i, i
+                                                   + width));
+            builder.append(System.lineSeparator());
+        }
+        return builder.toString();
     }
 
     @Override
