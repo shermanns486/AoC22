@@ -34,7 +34,9 @@ public class Node implements Comparable<Node> {
     }
 
     public int getF() {
-        return this.g + this.h + getDeltaHeight();
+        return this.g
+               + this.h
+               + getDeltaHeight();
     }
 
     public int getG() {
@@ -55,8 +57,8 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return String.format("Node [%n  p=%s,%n  f=%s,%n  g=%s,%n  h=%s,%n  height=%s,%n  deltaHeight=%s%n]", this.p,
-                getF(), this.g, this.h, this.height, getDeltaHeight());
+        return String.format("Node [p=%s, f=%s, g=%s, h=%s, height=%s, deltaHeight=%s]", this.p, getF(), this.g, this.h,
+                this.height, getDeltaHeight());
     }
 
     @Override
@@ -81,12 +83,13 @@ public class Node implements Comparable<Node> {
         if (this.parent == null) {
             return 0;
         }
-        return this.height - this.parent.getHeight();
+        return this.height
+               - this.parent.getHeight();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.g, this.h, this.height, this.p, this.parent);
+        return Objects.hash(this.p);
     }
 
     @Override
@@ -94,17 +97,22 @@ public class Node implements Comparable<Node> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Node)) {
+        if (obj == null
+            || getClass() != obj.getClass()) {
             return false;
         }
         final Node other = (Node) obj;
-        return this.p.equals(other.p);
+        return Objects.equals(this.p, other.p);
     }
 }
 
 record Point(int x, int y) {
     @Override
     public String toString() {
-        return "[x=" + this.x + ", y=" + this.y + "]";
+        return "[x="
+               + this.x
+               + ", y="
+               + this.y
+               + "]";
     }
 }
