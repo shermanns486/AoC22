@@ -8,6 +8,7 @@ public class Node implements Comparable<Node> {
     private int g;
     private int h;
     private char height;
+    private Direction direction;
 
     public Node(final int x, final int y, final char height, final int g, final Node parent) {
         this.p = new Point(x, y);
@@ -15,6 +16,7 @@ public class Node implements Comparable<Node> {
         this.parent = parent;
         this.g = g;
         this.h = 0;
+        this.direction = null;
     }
 
     public Point getP() {
@@ -35,7 +37,7 @@ public class Node implements Comparable<Node> {
 
     public int getF() {
         return this.g
-               + this.h
+               - this.h
                + getDeltaHeight();
     }
 
@@ -57,8 +59,8 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return String.format("Node [p=%s, f=%s, g=%s, h=%s, height=%s, deltaHeight=%s]", this.p, getF(), this.g, this.h,
-                this.height, getDeltaHeight());
+        return String.format("Node [p=%s, f=%s, g=%s, h=%s, height=%s, deltaHeight=%s, direction=%s]", this.p, getF(),
+                this.g, this.h, this.height, getDeltaHeight(), getDirection());
     }
 
     @Override
@@ -83,8 +85,25 @@ public class Node implements Comparable<Node> {
         if (this.parent == null) {
             return 0;
         }
-        return this.height
-               - this.parent.getHeight();
+
+        char ourHeight = this.height;
+        if (ourHeight == 'S') {
+            ourHeight = 'a';
+        }
+        else if (ourHeight == 'E') {
+            ourHeight = 'z';
+        }
+
+        char otherHeight = this.parent.getHeight();
+        if (otherHeight == 'S') {
+            otherHeight = 'a';
+        }
+        else if (otherHeight == 'E') {
+            otherHeight = 'z';
+        }
+
+        return ourHeight
+               - otherHeight;
     }
 
     @Override
@@ -104,6 +123,14 @@ public class Node implements Comparable<Node> {
         final Node other = (Node) obj;
         return Objects.equals(this.p, other.p);
     }
+
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    public void setDirection(final Direction direction) {
+        this.direction = direction;
+    }
 }
 
 record Point(int x, int y) {
@@ -114,5 +141,19 @@ record Point(int x, int y) {
                + ", y="
                + this.y
                + "]";
+    }
+}
+
+enum Direction {
+    UP('^'), DOWN('v'), LEFT('<'), RIGHT('>');
+
+    char c;
+
+    Direction(final char c) {
+        this.c = c;
+    }
+
+    public char getC() {
+        return this.c;
     }
 }

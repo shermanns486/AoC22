@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.IntPredicate;
@@ -14,7 +15,7 @@ import de.shermanns.aoc22.Base;
 
 public class Day12 extends Base {
     private static final boolean TEIL_1 = true;
-    private static final boolean TEST = false;
+    private static final boolean TEST = true;
 
     private static final String INPUT_TXT = "input.txt";
     private static final String TEST_TXT = "test.txt";
@@ -58,20 +59,16 @@ public class Day12 extends Base {
 
         for (int y = 0; y < maxY; y++) {
             for (int x = 0; x < maxX; x++) {
-                char c = this.zeilen.get(y).charAt(x);
+                final char character = this.zeilen.get(y).charAt(x);
 
-                if (c == 'S') {
-                    c = 'a';
-                    this.startNode = new Node(x, y, c, 0, null);
-                    this.startNode.setHeight(c);
+                if (character == 'S') {
+                    this.startNode = new Node(x, y, 'a', 0, null);
                 }
-                else if (c == 'E') {
-                    c = 'z';
-                    this.endNode = new Node(x, y, c, 0, null);
-                    this.endNode.setHeight(c);
+                else if (character == 'E') {
+                    this.endNode = new Node(x, y, 'z', 0, null);
                 }
 
-                this.heightMap[y][x] = c;
+                this.heightMap[y][x] = character;
             }
         }
 
@@ -83,66 +80,91 @@ public class Day12 extends Base {
                            + this.startNode);
         System.out.println("End: "
                            + this.endNode);
+        System.out.println();
 
         this.openList.add(this.startNode);
 
         long iteration = 0L;
+        boolean endNodeFound = false;
 
         while (!this.openList.isEmpty()) {
             this.selectedNode = this.openList.poll();
+            if (this.selectedNode.getParent() != null) {
+                this.selectedNode.getParent().setDirection(this.selectedNode.getDirection());
+            }
 
-            System.out.println("\n=== Iteration "
+            System.out.println("=== Iteration "
                                + iteration
                                + " ===\n");
 
             System.out.println(printMap(this.heightMap));
 
-            System.out.println("Selected "
-                               + this.selectedNode
-                               + "\n");
+            if (Day12.TEST) {
+                System.out.println("Selected "
+                                   + this.selectedNode
+                                   + "\n");
+            }
 
             if (this.selectedNode.equals(this.endNode)) {
-                System.out.println("Endnode found");
-                return;
+                System.out.println("SUCCESS: Endnode found after "
+                                   + iteration
+                                   + " iteration(s)");
+
+                endNodeFound = true;
+                break;
             }
 
             this.closedSet.add(this.selectedNode);
 
             final List<Node> expandedNodes = expandNode(this.selectedNode);
-
-            // System.out.println("Expanded Nodes: "
-            // + expandedNodes.size()
-            // + "\n");
-
             for (final Node n : expandedNodes) {
-                if (!this.closedSet.contains(n)
-                    && !this.openList.contains(n)) {
+                if (getNode(this.closedSet, n.getP()).isEmpty()
+                    && getNode(this.openList, n.getP()).isEmpty()) {
                     this.openList.add(n);
-                    // System.out.println("Added "
-                    // + n);
+
+                    if (Day12.TEST) {
+                        System.out.println("Added "
+                                           + n);
+                    }
                 }
             }
+            if (Day12.TEST) {
+                System.out.println();
+            }
 
-            // System.out.println("\nOpen list ("
-            // + this.openList.size()
-            // + "):\n"
-            // + printCollection(this.openList)
-            // + "\n");
-            // System.out.println("Closed list ("
-            // + this.closedSet.size()
-            // + "):\n"
-            // + printCollection(this.closedSet));
+            if (Day12.TEST) {
+                System.out.println("\n== Open list ("
+                                   + this.openList.size()
+                                   + ") ==\n\n"
+                                   + printCollection(this.openList)
+                                   + "\n"
+                                   + "\n== Closed list ("
+                                   + this.closedSet.size()
+                                   + ") ==\n\n"
+                                   + printCollection(this.closedSet)
+                                   + "\n");
+            }
 
             iteration++;
+        }
+
+        if (!endNodeFound) {
+            System.out.println("ERROR: Endnode not found after "
+                               + iteration
+                               + " iterations");
         }
     }
 
     private <T> String printCollection(final Collection<T> collection) {
-        return collection.stream().map(T::toString).collect(Collectors.joining(",\n", "", ""));
+        return collection.stream() //
+                .map(T::toString) //
+                .collect(Collectors.joining(",\n", "", ""));
     }
 
-    private boolean closedSetContains(final Point otherP) {
-        return this.closedSet.stream().map(Node::getP).anyMatch(p -> p.equals(otherP));
+    private Optional<Node> getNode(final Collection<Node> col, final Point otherP) {
+        return col.stream() //
+                .filter(n -> n.getP().equals(otherP)) //
+                .findFirst();
     }
 
     private List<Node> expandNode(final Node selectedNode) {
@@ -150,77 +172,50 @@ public class Day12 extends Base {
         final int nodeX = nodeP.x();
         final int nodeY = nodeP.y();
         final int nodeG = selectedNode.getG();
+        final int newG = nodeG
+                         + 1;
         final List<Node> expandedNodes = new ArrayList<>(4);
-
         final IntPredicate nodeValid = i -> i == 0
                                             || Math.abs(i) == 1;
 
-        final int newG = nodeG
-                         + 1;
-
         // Up
-        int newX = nodeX;
-        int newY = nodeY
-                   - 1;
-
-        if (newX != -1
-            && newY != -1
-            && newX < this.heightMap[0].length
-            && newY < this.heightMap.length) {
-            final Node nodeU = new Node(newX, newY, this.heightMap[newY][newX], newG, selectedNode);
-            nodeU.setH(h(this.startNode));
-            if (nodeValid.test(nodeU.getDeltaHeight())) {
-                expandedNodes.add(nodeU);
-            }
-        }
+        expandNode(selectedNode, expandedNodes, nodeX, nodeY
+                                                       - 1,
+                newG, Direction.UP, nodeValid);
 
         // Down
-        newY = nodeY
-               + 1;
-
-        if (newX != -1
-            && newY != -1
-            && newX < this.heightMap[0].length
-            && newY < this.heightMap.length) {
-            final Node nodeD = new Node(newX, newY, this.heightMap[newY][newX], newG, selectedNode);
-            nodeD.setH(h(this.startNode));
-            if (nodeValid.test(nodeD.getDeltaHeight())) {
-                expandedNodes.add(nodeD);
-            }
-        }
+        expandNode(selectedNode, expandedNodes, nodeX, nodeY
+                                                       + 1,
+                newG, Direction.DOWN, nodeValid);
 
         // Left
-        newX = nodeX
-               - 1;
-        newY = nodeY;
-
-        if (newX != -1
-            && newY != -1
-            && newX < this.heightMap[0].length
-            && newY < this.heightMap.length) {
-            final Node nodeL = new Node(newX, newY, this.heightMap[newY][newX], newG, selectedNode);
-            nodeL.setH(h(this.startNode));
-            if (nodeValid.test(nodeL.getDeltaHeight())) {
-                expandedNodes.add(nodeL);
-            }
-        }
+        expandNode(selectedNode, expandedNodes, nodeX
+                                                - 1,
+                nodeY, newG, Direction.LEFT, nodeValid);
 
         // Right
-        newX = nodeX
-               + 1;
+        expandNode(selectedNode, expandedNodes, nodeX
+                                                + 1,
+                nodeY, newG, Direction.RIGHT, nodeValid);
 
+        return expandedNodes;
+    }
+
+    public void expandNode(final Node selectedNode, final List<Node> expandedNodes, final int newX, final int newY,
+            final int newG, final Direction direction, final IntPredicate nodeValid) {
         if (newX != -1
             && newY != -1
             && newX < this.heightMap[0].length
             && newY < this.heightMap.length) {
-            final Node nodeR = new Node(newX, newY, this.heightMap[newY][newX], newG, selectedNode);
-            nodeR.setH(h(this.startNode));
-            if (nodeValid.test(nodeR.getDeltaHeight())) {
-                expandedNodes.add(nodeR);
+
+            final Node node = new Node(newX, newY, this.heightMap[newY][newX], newG, selectedNode);
+            node.setDirection(direction);
+            node.setH(h(node));
+
+            if (nodeValid.test(node.getDeltaHeight())) {
+                expandedNodes.add(node);
             }
         }
-
-        return expandedNodes;
     }
 
     private int h(final Node n) {
@@ -234,20 +229,23 @@ public class Day12 extends Base {
         final StringBuilder builder = new StringBuilder();
 
         for (final int lineIndex : IntStream.range(0, map.length).toArray()) {
+            // Print linenumber
             builder.append(String.format("%2d: ", lineIndex));
 
             for (final int columnIndex : IntStream.range(0, map[0].length).toArray()) {
-                final Point p = new Point(columnIndex, lineIndex);
+                final Point actualP = new Point(columnIndex, lineIndex);
 
-                if (closedSetContains(p)) {
-                    builder.append('#');
+                final Optional<Node> closedNode = getNode(this.closedSet, actualP);
+                if (closedNode.isPresent()) {
+                    builder.append(closedNode.get().getDirection().getC());
                 }
                 else if (this.selectedNode != null
-                         && p.equals(this.selectedNode.getP())) {
+                         && actualP.equals(this.selectedNode.getP())) {
                     builder.append('!');
                 }
                 else {
                     builder.append(map[lineIndex][columnIndex]);
+                    // builder.append('.');
                 }
             }
 
