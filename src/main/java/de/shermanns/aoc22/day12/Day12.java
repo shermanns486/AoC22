@@ -97,9 +97,9 @@ public class Day12 extends Base {
                                + iteration
                                + " ===\n");
 
-            System.out.println(printMap(this.heightMap));
-
             if (Day12.TEST) {
+                System.out.println(printMap(this.heightMap));
+
                 System.out.println("Selected "
                                    + this.selectedNode
                                    + "\n");
@@ -118,8 +118,8 @@ public class Day12 extends Base {
 
             final List<Node> expandedNodes = expandNode(this.selectedNode);
             for (final Node n : expandedNodes) {
-                if (getNode(this.closedSet, n.getP()).isEmpty()
-                    && getNode(this.openList, n.getP()).isEmpty()) {
+                if (getNode(this.closedSet, n.getX(), n.getY()).isEmpty()
+                    && getNode(this.openList, n.getX(), n.getY()).isEmpty()) {
                     this.openList.add(n);
 
                     if (Day12.TEST) {
@@ -153,6 +153,22 @@ public class Day12 extends Base {
                                + iteration
                                + " iterations");
         }
+        else {
+            System.out.println("Steps: "
+                               + getSteps());
+        }
+    }
+
+    private int getSteps() {
+        Node n = this.selectedNode.getParent();
+        int steps = 0;
+
+        while (n != null) {
+            n = n.getParent();
+            steps++;
+        }
+
+        return steps;
     }
 
     private <T> String printCollection(final Collection<T> collection) {
@@ -161,22 +177,21 @@ public class Day12 extends Base {
                 .collect(Collectors.joining(",\n", "", ""));
     }
 
-    private Optional<Node> getNode(final Collection<Node> col, final Point otherP) {
+    private Optional<Node> getNode(final Collection<Node> col, final int otherX, final int otherY) {
         return col.stream() //
-                .filter(n -> n.getP().equals(otherP)) //
+                .filter(n -> n.getX() == otherX
+                             && n.getY() == otherY) //
                 .findFirst();
     }
 
     private List<Node> expandNode(final Node selectedNode) {
-        final Point nodeP = selectedNode.getP();
-        final int nodeX = nodeP.x();
-        final int nodeY = nodeP.y();
+        final int nodeX = selectedNode.getX();
+        final int nodeY = selectedNode.getY();
         final int nodeG = selectedNode.getG();
         final int newG = nodeG
                          + 1;
         final List<Node> expandedNodes = new ArrayList<>(4);
-        final IntPredicate nodeValid = i -> i == 0
-                                            || Math.abs(i) == 1;
+        final IntPredicate nodeValid = i -> i <= 1;
 
         // Up
         expandNode(selectedNode, expandedNodes, nodeX, nodeY
@@ -219,32 +234,31 @@ public class Day12 extends Base {
     }
 
     private int h(final Node n) {
-        return Math.abs(n.getP().x()
-                        - this.endNode.getP().x())
-               + Math.abs(n.getP().y()
-                          - this.endNode.getP().y());
+        return Math.abs(n.getX()
+                        - this.endNode.getX())
+               + Math.abs(n.getY()
+                          - this.endNode.getY());
     }
 
     private String printMap(final char[][] map) {
         final StringBuilder builder = new StringBuilder();
 
-        for (final int lineIndex : IntStream.range(0, map.length).toArray()) {
+        for (final int y : IntStream.range(0, map.length).toArray()) {
             // Print linenumber
-            builder.append(String.format("%2d: ", lineIndex));
+            builder.append(String.format("%2d: ", y));
 
-            for (final int columnIndex : IntStream.range(0, map[0].length).toArray()) {
-                final Point actualP = new Point(columnIndex, lineIndex);
-
-                final Optional<Node> closedNode = getNode(this.closedSet, actualP);
+            for (final int x : IntStream.range(0, map[0].length).toArray()) {
+                final Optional<Node> closedNode = getNode(this.closedSet, x, y);
                 if (closedNode.isPresent()) {
                     builder.append(closedNode.get().getDirection().getC());
                 }
                 else if (this.selectedNode != null
-                         && actualP.equals(this.selectedNode.getP())) {
+                         && this.selectedNode.getX() == x
+                         && this.selectedNode.getY() == y) {
                     builder.append('!');
                 }
                 else {
-                    builder.append(map[lineIndex][columnIndex]);
+                    builder.append(map[y][x]);
                     // builder.append('.');
                 }
             }

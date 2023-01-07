@@ -3,7 +3,8 @@ package de.shermanns.aoc22.day12;
 import java.util.Objects;
 
 public class Node implements Comparable<Node> {
-    private Point p;
+    private int x;
+    private int y;
     private Node parent;
     private int g;
     private int h;
@@ -11,7 +12,8 @@ public class Node implements Comparable<Node> {
     private Direction direction;
 
     public Node(final int x, final int y, final char height, final int g, final Node parent) {
-        this.p = new Point(x, y);
+        this.x = x;
+        this.y = y;
         this.height = height;
         this.parent = parent;
         this.g = g;
@@ -19,12 +21,20 @@ public class Node implements Comparable<Node> {
         this.direction = null;
     }
 
-    public Point getP() {
-        return this.p;
+    public int getX() {
+        return this.x;
     }
 
-    public void setP(final Point p) {
-        this.p = p;
+    public void setX(final int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    public void setY(final int y) {
+        this.y = y;
     }
 
     public Node getParent() {
@@ -59,8 +69,8 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return String.format("Node [p=%s, f=%s, g=%s, h=%s, height=%s, deltaHeight=%s, direction=%s]", this.p, getF(),
-                this.g, this.h, this.height, getDeltaHeight(), getDirection());
+        return String.format("Node [x=%s, y=%s, g=%s, h=%s, height=%s, direction=%s, getF()=%s, getDeltaHeight()=%s]",
+                this.x, this.y, this.g, this.h, this.height, this.direction, getF(), getDeltaHeight());
     }
 
     @Override
@@ -69,7 +79,7 @@ public class Node implements Comparable<Node> {
             return 0;
         }
         else {
-            return getF() < o.getF() ? 1 : -1;
+            return getF() < o.getF() ? -1 : 1;
         }
     }
 
@@ -106,24 +116,6 @@ public class Node implements Comparable<Node> {
                - otherHeight;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.p);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null
-            || getClass() != obj.getClass()) {
-            return false;
-        }
-        final Node other = (Node) obj;
-        return Objects.equals(this.p, other.p);
-    }
-
     public Direction getDirection() {
         return this.direction;
     }
@@ -131,16 +123,23 @@ public class Node implements Comparable<Node> {
     public void setDirection(final Direction direction) {
         this.direction = direction;
     }
-}
 
-record Point(int x, int y) {
     @Override
-    public String toString() {
-        return "[x="
-               + this.x
-               + ", y="
-               + this.y
-               + "]";
+    public int hashCode() {
+        return Objects.hash(this.x, this.y);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Node)) {
+            return false;
+        }
+        final Node other = (Node) obj;
+        return this.x == other.x
+               && this.y == other.y;
     }
 }
 
